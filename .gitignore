@@ -455,3 +455,5 @@ $RECYCLE.BIN/
 !.vscode/launch.json
 !.vscode/extensions.json
 API/HotDeskHub.db
+API/HotDeskHub.db-shm
+API/HotDeskHub.db-wal

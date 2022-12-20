@@ -10,5 +10,7 @@ namespace Persistence
         }
 
         public DbSet<Location> Locations { get; set; }
+        public DbSet<Desk> Desks { get; set; }
+        public DbSet<Employee> Employees { get; set; }
     }
 }

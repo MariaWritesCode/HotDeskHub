@@ -10,6 +10,14 @@ namespace Persistence
     {
         public static async Task SeedData(DataContext context)
         {
+            await SeedLocations(context);
+            await SeedEmployees(context);
+
+            await context.SaveChangesAsync();
+        }
+
+        public static async Task SeedLocations(DataContext context)
+        {
             if (context.Locations.Any()) return;
 
             var locations = new List<Location>
@@ -19,12 +27,34 @@ namespace Persistence
                     Building = "Podium1",
                     Floor = 1,
                     Room = "32b",
+                    Desks = new List<Desk>
+                    {
+                        new Desk
+                        {
+                            Available = true
+                        },
+                        new Desk
+                        {
+                            Available = false
+                        }
+                    }
                 },
                 new Location
                 {
                     Building = "Podium1",
                     Floor = 3,
                     Room = "45f",
+                    Desks = new List<Desk>
+                    {
+                        new Desk
+                        {
+                            Available = true
+                        },
+                        new Desk
+                        {
+                            Available = false
+                        }
+                    }
                 },
                 new Location
                 {
@@ -38,7 +68,7 @@ namespace Persistence
                     Floor = 2,
                     Room = "12a",
                 },
-                
+
                new Location
                 {
                     Building = "Podium1",
@@ -48,8 +78,29 @@ namespace Persistence
             };
 
             await context.Locations.AddRangeAsync(locations);
-            await context.SaveChangesAsync();
         }
 
+        public static async Task SeedEmployees(DataContext context)
+        {
+            if (context.Employees.Any()) return;
+
+            var employees = new List<Employee>
+            {
+                new Employee
+                {
+                    FirstName = "Bob",
+                    LastName = "Builder",
+                    IsAdministrator = false
+                },
+                new Employee
+                {
+                    FirstName = "Sam",
+                    LastName = "Fireman",
+                    IsAdministrator = true
+                }
+            };
+
+            await context.Employees.AddRangeAsync(employees);
+        }
     }
 }
