@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Desks;
+using AutoMapper;
 using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -11,20 +13,24 @@ namespace Application.Locations
 {
     public class List
     {
-        public class Query: IRequest<List<Location>> {}
+        public class Query : IRequest<List<LocationDto>> { }
 
-        public class Handler : IRequestHandler<Query, List<Location>>
+        public class Handler : IRequestHandler<Query, List<LocationDto>>
         {
             private readonly DataContext _context;
+            private readonly IMapper _mapper;
 
-            public Handler(DataContext context)
+            public Handler(DataContext context, IMapper mapper)
             {
+                _mapper = mapper;
                 _context = context;
             }
-            
-            public async Task<List<Location>> Handle(Query request, CancellationToken cancellationToken)
+
+            public async Task<List<LocationDto>> Handle(Query request, CancellationToken cancellationToken)
             {
-                return await _context.Locations.ToListAsync();
+                var locations = await _context.Locations.ToListAsync();
+
+                return _mapper.Map<List<LocationDto>>(locations);
             }
         }
     }

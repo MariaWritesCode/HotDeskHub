@@ -2,31 +2,40 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Domain;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Persistence;
 
 namespace Application.Desks
 {
     public class Details
     {
-        public class Query : IRequest<Desk>
+        public class Query : IRequest<DeskDto>
         {
             public int Id { get; set; }
         }
 
-        public class Handler : IRequestHandler<Query, Desk>
+        public class Handler : IRequestHandler<Query, DeskDto>
         {
             private readonly DataContext _context;
-            public Handler(DataContext context)
+            private readonly IMapper _mapper;
+            
+            public Handler(DataContext context, IMapper mapper)
             {
+                _mapper = mapper;
                 _context = context;
-
             }
 
-            public async Task<Desk> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<DeskDto> Handle(Query request, CancellationToken cancellationToken)
             {
-                return await _context.Desks.FindAsync(request.Id);
+                var desk = await _context.Desks
+                    .Include(desk => desk.Reservations)
+                    .ThenInclude(reservation => reservation.Employee)
+                    .SingleOrDefaultAsync(desk => desk.Id == request.Id);
+
+                return _mapper.Map<DeskDto>(desk);
             }
         }
     }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -11,28 +12,29 @@ namespace Application.Desks
 {
     public class List
     {
-        public class Query : IRequest<List<Desk>>
+        public class Query : IRequest<List<DeskDto>>
         {
             public int Location { get; set; }
         }
 
-        public class Handler : IRequestHandler<Query, List<Desk>>
+        public class Handler : IRequestHandler<Query, List<DeskDto>>
         {
             private readonly DataContext _context;
+            private readonly IMapper _mapper;
 
-            public Handler(DataContext context)
+            public Handler(DataContext context, IMapper mapper)
             {
+                _mapper = mapper;
                 _context = context;
             }
 
-            public async Task<List<Desk>> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<List<DeskDto>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var desks = _context.Desks.Where(desk => desk.Available);
+                var desks = await _context.Desks
+                    .Where(desk => request.Location == default || desk.Location.Id == request.Location)
+                    .ToListAsync();
 
-                if(request.Location > 0)
-                    desks = desks.Where(desk => desk.Location.Id == request.Location);
-
-                return await desks.ToListAsync();
+                return _mapper.Map<List<DeskDto>>(desks);
             }
         }
     }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Desks;
 using Application.Locations;
 using Domain;
 using MediatR;
@@ -15,34 +16,34 @@ namespace API.Controllers
     {
 
         [HttpGet]
-        public async Task<ActionResult<List<Location>>> GetLocations()
+        public async Task<ActionResult<List<LocationDto>>> GetLocations()
         {
-            return await Mediator.Send(new List.Query());
+            return await Mediator.Send(new Application.Locations.List.Query());
         }
 
         [HttpGetAttribute("{id}")]
-        public async Task<ActionResult<Location>> GetLocation(int id)
+        public async Task<ActionResult<LocationDto>> GetLocation(int id)
         {
-            return await Mediator.Send(new Details.Query { Id = id });
+            return await Mediator.Send(new Application.Locations.Details.Query { Id = id });
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateLocation(Location location)
         {
-            return Ok(await Mediator.Send(new Create.Command { Location = location }));
+            return Ok(await Mediator.Send(new Application.Locations.Create.Command { Location = location }));
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> EditLocation(int id, Location location)
         {
             location.Id = id;
-            return Ok(await Mediator.Send(new Edit.Command { Location = location }));
+            return Ok(await Mediator.Send(new Application.Locations.Edit.Command { Location = location }));
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteLoation(int id)
         {
-            return Ok(await Mediator.Send(new Delete.Command { Id = id }));
+            return Ok(await Mediator.Send(new Application.Locations.Delete.Command { Id = id }));
         }
 
         [HttpPost("{locationId}/desks")]

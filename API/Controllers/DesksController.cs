@@ -15,15 +15,22 @@ namespace API.Controllers
     {
 
         [HttpGet]
-        public async Task<ActionResult<List<Desk>>> GetDesks([FromQuery] int location)
+        public async Task<ActionResult<List<DeskDto>>> GetDesks([FromQuery] int location)
         {
             return await Mediator.Send(new List.Query { Location = location });
         }
 
         [HttpGetAttribute("{id}")]
-        public async Task<ActionResult<Desk>> GetDesk(int id)
+        public async Task<ActionResult<DeskDto>> GetDesk(int id)
         {
             return await Mediator.Send(new Details.Query { Id = id });
+        }
+
+        [HttpPost("{deskId}/book")]
+        public async Task<IActionResult> BookDesk(int deskId, Book.Command command)
+        {
+            command.DeskId = deskId;
+            return Ok(await Mediator.Send(command));
         }
     }
 }

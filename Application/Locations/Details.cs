@@ -2,31 +2,43 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Desks;
+using AutoMapper;
 using Domain;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Persistence;
 
 namespace Application.Locations
 {
     public class Details
     {
-        public class Query : IRequest<Location>
+        public class Query : IRequest<LocationDto>
         {
             public int Id { get; set; }
         }
 
-        public class Handler : IRequestHandler<Query, Location>
+        public class Handler : IRequestHandler<Query, LocationDto>
         {
             private readonly DataContext _context;
-            public Handler(DataContext context)
+            private readonly IMapper _mapper;
+            
+            public Handler(DataContext context, IMapper mapper)
             {
+                _mapper = mapper;
                 _context = context;
 
             }
 
-            public async Task<Location> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<LocationDto> Handle(Query request, CancellationToken cancellationToken)
             {
-                return await _context.Locations.FindAsync(request.Id);
+                var location = await _context.Locations
+                    .Include(location => location.Desks)
+                    .ThenInclude(location => location.Reservations)
+                    .ThenInclude(reservation => reservation.Employee)
+                    .SingleOrDefaultAsync(location => location.Id == request.Id);
+
+                return _mapper.Map<LocationDto>(location);
             }
         }
     }

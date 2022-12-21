@@ -21,13 +21,19 @@ namespace Application.Desks
             public Handler(DataContext context)
             {
                 _context = context;
-
             }
+
             public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
-                var desk = await _context.Desks.FindAsync(request.DeskId);
+                var desk = await _context.Desks
+                    .Include(desk => desk.Reservations)
+                    .SingleOrDefaultAsync(desk => desk.Id == request.DeskId);
 
-                desk.Available = !desk.Available;
+                if(desk == null)
+                    throw new NullReferenceException("You can't delete this desk because it doesn't exists");
+
+                if(desk.Reservations.Any())
+                    throw new InvalidOperationException("You can't remove desk because it contains some revervations.");
 
                 _context.Desks.Remove(desk);
 

@@ -5,5 +5,6 @@ namespace Domain
         public int Id { get; set; }
         public bool Available { get; set; }
         public Location Location { get; set; }
+        public List<Reservation> Reservations { get; set; }
     }
 }
