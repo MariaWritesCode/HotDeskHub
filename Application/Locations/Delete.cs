@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Domain;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Persistence;
 
 namespace Application.Locations
 {
@@ -17,25 +16,25 @@ namespace Application.Locations
 
         public class Handler : IRequestHandler<Command>
         {
-            private readonly DataContext _context;
-            public Handler(DataContext context)
+            private readonly ILocationRepository _locationRepository;
+            public Handler(ILocationRepository locationRepository)
             {
-                _context = context;
-
+                _locationRepository = locationRepository;
             }
+
             public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
-                var location = await _context.Locations.Include(location => location.Desks).FirstOrDefaultAsync(location => location.Id == request.Id);
+                var location = await _locationRepository.FindLocationWithDesksById(request.Id);
 
-                if(location == null)
+                if (location == null)
                     throw new NullReferenceException("You can't delete this location because it doesn't exists");
 
-                if(location.Desks.Any())
+                if (location.Desks.Any())
                     throw new InvalidOperationException("You can't remove location because it contains some desks. Please remove all desks from location first.");
 
-                _context.Locations.Remove(location);
+                _locationRepository.Remove(location);
 
-                await _context.SaveChangesAsync();
+                var result = await _locationRepository.Save();
 
                 return Unit.Value;
             }
