@@ -33,7 +33,7 @@ namespace Application.UnitTests.Locations
         public void Delete_LocationDesksNotEmpty_ThrowsInvalidOperationException()
         {
             int locationId = 1;
-            _fakeLocationRepository.FindLocationWithDesksById(locationId).Returns(new Location { Desks = new List<Desk> { new Desk() } });
+            _fakeLocationRepository.FindLocationWithDesksById(locationId).Returns(new Location { Desks = { new Desk() } });
 
             var exception = Assert.ThrowsAsync<InvalidOperationException>(() => _handler.Handle(new Command { Id = locationId }, default));
 
