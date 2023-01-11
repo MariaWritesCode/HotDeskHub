@@ -32,5 +32,12 @@ namespace API.Controllers
             command.DeskId = deskId;
             return Ok(await Mediator.Send(command));
         }
+
+        [HttpPut("{deskId}/book")]
+        public async Task<IActionResult> ChangeDesk(int deskId, Rebook.Command command)
+        {
+            command.FromDeskId = deskId;
+            return Ok(await Mediator.Send(command));
+        }
     }
 }
