@@ -1,17 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Domain;
+using Microsoft.AspNetCore.Identity;
 
 namespace Persistence
 {
     public class Seed
     {
-        public static async Task SeedData(DataContext context)
+        public static async Task SeedData(DataContext context, UserManager<Employee> userManager)
         {
             await SeedLocations(context);
-            await SeedEmployees(context);
+            await SeedEmployees(userManager);
 
             await context.SaveChangesAsync();
         }
@@ -80,27 +82,29 @@ namespace Persistence
             await context.Locations.AddRangeAsync(locations);
         }
 
-        public static async Task SeedEmployees(DataContext context)
+        public static async Task SeedEmployees(UserManager<Employee> userManager)
         {
-            if (context.Employees.Any()) return;
+            if (userManager.Users.Any()) return;
 
-            var employees = new List<Employee>
+            var bob = new Employee
             {
-                new Employee
-                {
-                    FirstName = "Bob",
-                    LastName = "Builder",
-                    IsAdministrator = false
-                },
-                new Employee
-                {
-                    FirstName = "Sam",
-                    LastName = "Fireman",
-                    IsAdministrator = true
-                }
+                FirstName = "Bob",
+                LastName = "Builder",
+                UserName = "bob@test.com",
             };
 
-            await context.Employees.AddRangeAsync(employees);
+            var sam = new Employee
+            {
+                FirstName = "Sam",
+                LastName = "Fireman",
+                UserName = "sam@test.com",
+            };
+
+
+            await userManager.CreateAsync(bob, "Developer123");
+            await userManager.AddClaimAsync(bob, new Claim(ClaimTypes.Role, "User"));
+            await userManager.CreateAsync(sam, "Developer123");
+            await userManager.AddClaimAsync(sam, new Claim(ClaimTypes.Role, "Admin"));
         }
     }
 }

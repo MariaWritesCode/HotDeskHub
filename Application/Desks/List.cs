@@ -14,7 +14,7 @@ namespace Application.Desks
     {
         public class Query : IRequest<List<DeskDto>>
         {
-            public int Location { get; set; }
+            public int LocationId { get; set; }
         }
 
         public class Handler : IRequestHandler<Query, List<DeskDto>>
@@ -31,7 +31,7 @@ namespace Application.Desks
             public async Task<List<DeskDto>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var desks = await _context.Desks
-                    .Where(desk => request.Location == default || desk.Location.Id == request.Location)
+                    .Where(desk => request.LocationId == default || desk.Location.Id == request.LocationId)
                     .ToListAsync();
 
                 return _mapper.Map<List<DeskDto>>(desks);
