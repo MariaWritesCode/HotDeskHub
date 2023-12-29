@@ -33,10 +33,10 @@ namespace Application.Desks
                 if (employee == null)
                     throw new InvalidOperationException("You can't book this desk because specified employee doesn't exists");
 
-                var desk = await _context.Desks
+                var desk = _context.Desks
                     .Include(desk => desk.Reservations)
                     .ThenInclude(reservation => reservation.Employee)
-                    .SingleOrDefaultAsync(desk => desk.Id == request.DeskId);
+                    .SingleOrDefault(desk => desk.Id == request.DeskId);
 
                 if (desk == null)
                     throw new InvalidOperationException("You can't book this desk because it doesn't exists");
