@@ -25,9 +25,9 @@ namespace Application.Desks
 
             public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
             {
-                var desk = await _context.Desks
+                var desk = _context.Desks
                     .Include(desk => desk.Reservations)
-                    .SingleOrDefaultAsync(desk => desk.Id == request.DeskId);
+                    .SingleOrDefault(desk => desk.Id == request.DeskId);
 
                 if(desk == null)
                     throw new NullReferenceException("You can't delete this desk because it doesn't exists");

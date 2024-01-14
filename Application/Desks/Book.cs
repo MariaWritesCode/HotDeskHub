@@ -44,7 +44,7 @@ namespace Application.Desks
                 if (!desk.Available)
                     throw new InvalidOperationException("You can't book this desk because it is unavailable");
 
-                if (desk.Reservations.Any(reservation => reservation.Date == request.Date.Date))
+                if (desk.Reservations.Any(reservation => reservation.Date.Date == request.Date.Date))
                     throw new InvalidOperationException("You can't book this desk because it is already booked");
 
                 if (desk.Reservations.Count(reservation => reservation.Employee == employee) >= 7)
