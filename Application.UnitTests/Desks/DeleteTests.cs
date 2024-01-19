@@ -97,13 +97,11 @@ namespace Application.UnitTests.Desks
             Command testCommand = new() { DeskId = 1 };
 
             // Act & Assert
-
             await _sut.Handle(testCommand, default);
 
             await _dataContext.Received(1).SaveChangesAsync();
-            Assert.Empty(_dataContext.Desks);
 
-
+            _dataContext.Desks.Received(1).Remove(Arg.Is<Desk>(desk => desk.Id == 1));
         }
 
     }
